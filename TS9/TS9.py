@@ -36,14 +36,15 @@ bp_sos_iir = sig.iirdesign([wp1, wp2], [ws1, ws2], ripple, alfa_max, False, 'che
 
 w,h = sig.sosfreqz(bp_sos_iir,worN,False,fs)
 
-
-group_delay_diff = -np.diff(np.angle(h)) / np.diff(w)
-group_d = np.append(group_delay_diff[0],group_delay_diff)
-
-
 t, y_out = sig.impulse(sig.sos2zpk(bp_sos_iir)) #diverge el impulso
 
 gd = group_delay(w,np.angle(h))
+
+for i in range(len(gd)-1):
+    if (gd[i] > 10) or ( gd[i] < 0): # si detecto esos sobrepicos ficticios
+        # realizo un promedio de la muestra anterior y la futura
+        gd[i] = (gd[i-1] + gd[i+1])/2  
+
 
 plt.plot(t,y_out)
 plt.subplot(3, 1, 1)
@@ -67,7 +68,7 @@ plt.grid(True)
 plt.legend()
 
 plt.subplot(3, 1, 3)
-plt.plot(w,group_d,label='Retardo')
+plt.plot(w,gd,label='Retardo')
 plt.ylabel('Tiempo [seg]')
 plt.xlabel('Frecuencia [Hz]')
 plt.grid(True)
