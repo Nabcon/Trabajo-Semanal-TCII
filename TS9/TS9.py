@@ -40,6 +40,7 @@ t, y_out = sig.impulse(sig.sos2zpk(bp_sos_iir)) #diverge el impulso
 
 gd = group_delay(w,np.angle(h))
 
+# hago este for para poder borrar los sobrepicos erroneos del retardo de grupo
 for i in range(len(gd)-1):
     if (gd[i] > 10) or ( gd[i] < 0): # si detecto esos sobrepicos ficticios
         # realizo un promedio de la muestra anterior y la futura
