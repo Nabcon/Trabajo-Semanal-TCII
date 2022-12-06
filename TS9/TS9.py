@@ -90,6 +90,9 @@ plt.legend()
 
 #%% PARTE FIR
 
+# usar filtro cuadrados minimos ver ejemplos jupytest
+# partir el diseño pasalto y pasabajo . convolucion despues
+
 
 cant_coeficientes = 4601
 

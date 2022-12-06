@@ -103,12 +103,59 @@ fs = 10e3
 TS9_funcion(fc, fs,0,2,-5,1)
 
 #%% C).A Cambiamos la frecuencia de corte a 6KHz - fs = 100KHz
+
+def TS8_funcion_c(fc, fs,num,den,xlim1=0, xlim2=10,ylim1=-60, ylim2=4):
+    
+    WN = int(5*10e3) # Cantidad de puntos para la funcion Freqz
+    KHz = 1000
+    # Frecuencia de corte del filtro
+    # fc = 1e3
+    W_fc = 2*np.pi*fc
+    # Frecuencia de Sampling
+    # fs = 100e3
+    nq = fs/2
+    
+    # Normalizacion de las Fs
+    fs_n = fs/W_fc
+
+    numz_py, denz_py = sig.bilinear(num, den, fs_n) 
+    w_py, h_py = sig.freqz(numz_py,denz_py,WN)
+    
+    # filtro analogico
+    # w_analog, h_analog = sig.freqs(num_lp,den_lp)
+    w_analog, h_analog = sig.freqs(num,den,  worN=np.logspace(-3, 2, 1000))
+    h_analog_db    = 20*np.log10(np.maximum(np.abs(h_analog), 1e-4))
+    
+
+    h_db_py = 20*np.log10(np.maximum(np.abs(h_py), 1e-4))
+    
+    # Grafico
+    fig, ax = plt.subplots(nrows=1, ncols=1, sharex=True)
+    # MODULO
+    fig.suptitle('ButterWorth N=2')
+    ax.plot(w_py*nq/(np.pi*KHz), h_db_py,color='purple',linestyle='dashed', label = 'Digital')
+    ax.plot(w_analog*fc/KHz, h_analog_db, color = 'orange',linestyle=':',  linewidth=3, label = 'Analogico')
+    ax.grid(True)
+    ax.set_title('Respuesta Magnitud $f_c = {} KHz$ | $f_s = {} KHz$'.format(fc/KHz, fs/KHz))
+    ax.set_ylabel('Magnitud [dB]')
+    ax.set_xlabel('Frecuencia [KHz]')
+    ax.legend()
+    ax.set_xlim([xlim1, xlim2])
+    ax.set_ylim([ylim1, ylim2])
+    
+    
+Q = np.sqrt(2)/2
+
+# Pasa alto Butter
+num = [1,  0,  0]
+den = [1, 1/Q, 1]
+
 fc = 6e3
 fs = 100e3
-TS9_funcion(fc, fs,0,12,-6,1)
+TS8_funcion_c(fc, fs,num,den,0,50,-6,1)
 #%% C).B Cambiamos la frecuencia de corte a 6KHz - fs = 10KHz
 fc = 6e3
 fs = 10e3
-TS9_funcion(fc, fs)
+TS8_funcion_c(fc, fs,num,den,0,10,-12,1)
 
 
